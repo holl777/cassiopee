@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les exercices de Cassiopée ⭐</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --rose: #FF6B9D;
+    --mauve: #C77DFF;
+    --bleu: #48CAE4;
+    --vert: #80ED99;
+    --jaune: #FFD166;
+    --orange: #FF9F1C;
+    --bg: #FFF5F9;
+    --card: #ffffff;
+    --texte: #3D2C5E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--texte);
+    overflow-x: hidden;
+  }
+
+  /* Fond étoilé animé */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 15% 20%, rgba(255,107,157,0.12) 0%, transparent 40%),
+      radial-gradient(circle at 85% 10%, rgba(199,125,255,0.12) 0%, transparent 35%),
+      radial-gradient(circle at 50% 80%, rgba(72,202,228,0.10) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: slideDown 0.6s ease;
+  }
+
+  .header .emoji-top {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 6px;
+    animation: bounce 2s infinite;
+  }
+
+  .header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--rose), var(--mauve));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .header p {
+    font-size: 1rem;
+    color: #8B6DAF;
+    margin-top: 6px;
+  }
+
+  /* BARRE DE PROGRESSION */
+  .progress-bar-wrap {
+    background: #EEE0F5;
+    border-radius: 20px;
+    height: 14px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, var(--rose), var(--mauve));
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    min-width: 5%;
+  }
+
+  .progress-label {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #9B7EC8;
+    margin-top: -18px;
+    margin-bottom: 20px;
+  }
+
+  /* SECTIONS */
+  .section-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--texte);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-badge {
+    background: linear-gradient(135deg, var(--rose), var(--orange));
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* CARTE EXERCICE */
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 22px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(180,100,220,0.10);
+    border: 2px solid transparent;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .card.correct { border-color: var(--vert); background: #F0FFF4; }
+  .card.wrong   { border-color: #FF6B6B; background: #FFF5F5; }
+
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--texte);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .question-text .mot {
+    color: var(--mauve);
+    font-weight: 800;
+  }
+
+  /* CHOIX MULTIPLES */
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .choice-btn {
+    background: #F3EBF9;
+    border: 2.5px solid #DDD0ED;
+    border-radius: 14px;
+    padding: 12px 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--texte);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    background: var(--mauve);
+    color: white;
+    border-color: var(--mauve);
+    transform: scale(1.04);
+  }
+
+  .choice-btn.correct-choice {
+    background: var(--vert);
+    border-color: #52C476;
+    color: #1A5C35;
+  }
+
+  .choice-btn.wrong-choice {
+    background: #FFB3B3;
+    border-color: #FF6B6B;
+    color: #7A1010;
+  }
+
+  /* INPUT TEXTE */
+  .text-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2.5px solid #DDD0ED;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--texte);
+    background: #F9F4FF;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+  }
+
+  .text-input:focus { border-color: var(--mauve); }
+  .text-input.correct-input { border-color: var(--vert); background: #F0FFF4; }
+  .text-input.wrong-input { border-color: #FF6B6B; background: #FFF5F5; }
+
+  .validate-btn {
+    background: linear-gradient(135deg, var(--mauve), var(--rose));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 11px 28px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  .validate-btn:hover:not(:disabled) { transform: scale(1.05); }
+  .validate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* FEEDBACK */
+  .feedback {
+    margin-top: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: none;
+  }
+
+  .feedback.show { display: block; animation: pop 0.3s ease; }
+  .feedback.good { background: #D4F8E0; color: #1A5C35; }
+  .feedback.bad  { background: #FFE0E0; color: #7A1010; }
+
+  /* BONDS DE 10 - LIGNE DE NOMBRES */
+  .number-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 14px 0;
+    flex-wrap: wrap;
+  }
+
+  .num-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #F3EBF9;
+    border: 2.5px solid #DDD0ED;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--texte);
+    transition: all 0.3s;
+  }
+
+  .num-box.filled {
+    background: linear-gradient(135deg, var(--bleu), var(--mauve));
+    border-color: var(--mauve);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .num-box.blank {
+    background: white;
+    border: 2.5px dashed #C2A0DC;
+    cursor: pointer;
+  }
+
+  .num-box input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--texte);
+    outline: none;
+  }
+
+  .arrow-right {
+    color: var(--rose);
+    font-size: 1.3rem;
+    font-weight: 900;
+  }
+
+  /* ÉTOILES */
+  .stars {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .star {
+    font-size: 1.8rem;
+    opacity: 0.25;
+    transition: all 0.4s;
+    transform: scale(0.9);
+  }
+
+  .star.earned {
+    opacity: 1;
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px gold);
+    animation: starPop 0.4s ease;
+  }
+
+  /* ÉCRAN RÉCOMPENSE */
+  #reward-screen {
+    display: none;
+    text-align: center;
+    padding: 30px 20px;
+    animation: fadeUp 0.7s ease;
+  }
+
+  #reward-screen.show { display: block; }
+
+  .trophy {
+    font-size: 5rem;
+    display: block;
+    animation: bounce 1.5s infinite;
+    margin-bottom: 10px;
+  }
+
+  .reward-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--orange), var(--rose), var(--mauve));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .reward-msg {
+    font-size: 1.1rem;
+    color: #7A5CA0;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .certificate {
+    background: linear-gradient(135deg, #FFF9E6, #FFF0F8);
+    border: 3px solid var(--jaune);
+    border-radius: 24px;
+    padding: 24px 20px;
+    margin: 0 auto 24px;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 6px 30px rgba(255,209,102,0.3);
+  }
+
+  .certificate::before {
+    content: '🌟';
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+  }
+
+  .cert-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    color: var(--orange);
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .cert-name {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--mauve);
+    margin: 4px 0;
+  }
+
+  .cert-text {
+    font-size: 0.95rem;
+    color: #6B4E8A;
+    line-height: 1.5;
+  }
+
+  .confetti-emoji {
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    animation: fadeIn 1s ease 0.5s both;
+  }
+
+  .restart-btn {
+    background: linear-gradient(135deg, var(--bleu), var(--mauve));
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 14px 36px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 8px;
+  }
+
+  .restart-btn:hover { transform: scale(1.05); }
+
+  /* SCORE */
+  .score-display {
+    text-align: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1rem;
+    color: #9B7EC8;
+    margin-bottom: 20px;
+  }
+
+  .score-display span {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--mauve);
+  }
+
+  /* NEXT BTN */
+  .next-btn {
+    display: none;
+    margin-top: 12px;
+    background: linear-gradient(135deg, var(--vert), var(--bleu));
+    color: #1A5C35;
+    border: none;
+    border-radius: 14px;
+    padding: 10px 24px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .next-btn.show { display: inline-block; animation: pop 0.3s ease; }
+  .next-btn:hover { transform: scale(1.04); }
+
+  /* ANIMATIONS */
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(0.8); opacity: 0; }
+    80%  { transform: scale(1.06); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes starPop {
+    0%   { transform: scale(0.5) rotate(-20deg); }
+    70%  { transform: scale(1.3) rotate(5deg); }
+    100% { transform: scale(1.15) rotate(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div id="main-content">
+    <div class="header">
+      <span class="emoji-top">🦄</span>
+      <h1>Les exercices de Cassiopée</h1>
+      <p>Féminin &amp; Bonds de 10 — Liste 22</p>
+    </div>
+
+    <div class="stars" id="stars-display">
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+      <span class="star">⭐</span>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar" style="width:5%"></div>
+    </div>
+
+    <div class="score-display">Score : <span id="score-display">0</span> / 7</div>
+
+    <!-- === EXERCICE 1 : Accord féminin === -->
+    <div class="card" id="q1">
+      <div class="section-title">📝 Le masculin et le féminin <span class="section-badge">Q1</span></div>
+      <div class="question-text">Le garçon est <span class="mot">grand</span>. La fille est...</div>
+      <div class="choices">
+        <button class="choice-btn" onclick="checkChoice(this, 'grande', 'q1', 'A1')">grande</button>
+        <button class="choice-btn" onclick="checkChoice(this, 'grande', 'q1', 'A2')">grand</button>
+        <button class="choice-btn" onclick="checkChoice(this, 'grande', 'q1', 'A3')">grandi</button>
+        <button class="choice-btn" onclick="checkChoice(this, 'grande', 'q1', 'A4')">grands</button>
+      </div>
+      <div class="feedback" id="fb-q1"></div>
+    </div>
+
+    <!-- === EXERCICE 2 : Accord féminin === -->
+    <div class="card" id="q2" style="display:none">
+      <div class="section-title">📝 Le masculin et le féminin <span class="section-badge">Q2</span></div>
+      <div class="question-text">La <span class="mot">petite</span> <span class="mot">lapine</span> est <span class="mot">noire</span>.<br>Réécris la phrase au masculin :</div>
+      <input type="text" class="text-input" id="input-q2" placeholder="Le petit lapin est...">
+      <br>
+      <button class="validate-btn" onclick="checkText('q2', 'le petit lapin est noir')">Vérifier ✓</button>
+      <div class="feedback" id="fb-q2"></div>
+    </div>
+
+    <!-- === EXERCICE 3 : Féminin de l'adjectif === -->
+    <div class="card" id="q3" style="display:none">
+      <div class="section-title">📝 Le féminin <span class="section-badge">Q3</span></div>
+      <div class="question-text">Quel est le féminin de <span class="mot">joli</span> ?</div>
+      <div class="choices">
+        <button class="choice-btn" onclick="checkChoice(this, 'jolie', 'q3', 'B1')">joliée</button>
+        <button class="choice-btn" onclick="checkChoice(this, 'jolie', 'q3', 'B2')">jolie</button>
+        <button class="choice-btn" onclick="checkChoice(this, 'jolie', 'q3', 'B3')">jolis</button>
+        <button class="choice-btn" onclick="checkChoice(this, 'jolie', 'q3', 'B4')">jolies</button>
+      </div>
+      <div class="feedback" id="fb-q3"></div>
+    </div>
+
+    <!-- === EXERCICE 4 : Bonds de 10 (compléter) === -->
+    <div class="card" id="q4" style="display:none">
+      <div class="section-title">🔟 Bonds de 10 <span class="section-badge">Q4</span></div>
+      <div class="question-text">Complete la suite — compte par bonds de 10 !</div>
+      <div class="number-line" id="nl1">
+        <div class="num-box filled">10</div>
+        <span class="arrow-right">→</span>
+        <div class="num-box filled">20</div>
+        <span class="arrow-right">→</span>
+        <div class="num-box blank"><input type="number" id="nl1-a" placeholder="?"></div>
+        <span class="arrow-right">→</span>
+        <div class="num-box filled">40</div>
+        <span class="arrow-right">→</span>
+        <div class="num-box blank"><input type="number" id="nl1-b" placeholder="?"></div>
+      </div>
+      <button class="validate-btn" onclick="checkNumberLine('q4', [{id:'nl1-a',val:30},{id:'nl1-b',val:50}])">Vérifier ✓</button>
+      <div class="feedback" id="fb-q4"></div>
+    </div>
+
+    <!-- === EXERCICE 5 : Bonds de 10 (début différent) === -->
+    <div class="card" id="q5" style="display:none">
+      <div class="section-title">🔟 Bonds de 10 <span class="section-badge">Q5</span></div>
+      <div class="question-text">Compte par bonds de 10 à partir de <span class="mot">25</span> !</div>
+      <div class="number-line" id="nl2">
+        <div class="num-box filled">25</div>
+        <span class="arrow-right">→</span>
+        <div class="num-box blank"><input type="number" id="nl2-a" placeholder="?"></div>
+        <span class="arrow-right">→</span>
+        <div class="num-box blank"><input type="number" id="nl2-b" placeholder="?"></div>
+        <span class="arrow-right">→</span>
+        <div class="num-box filled">55</div>
+        <span class="arrow-right">→</span>
+        <div class="num-box blank"><input type="number" id="nl2-c" placeholder="?"></div>
+      </div>
+      <button class="validate-btn" onclick="checkNumberLine('q5', [{id:'nl2-a',val:35},{id:'nl2-b',val:45},{id:'nl2-c',val:65}])">Vérifier ✓</button>
+      <div class="feedback" id="fb-q5"></div>
+    </div>
+
+    <!-- === EXERCICE 6 : Bonds de 10 (en ordre décroissant) === -->
+    <div class="card" id="q6" style="display:none">
+      <div class="section-title">🔟 Bonds de 10 — À rebours ! <span class="section-badge">Q6</span></div>
+      <div class="question-text">Maintenant compte <strong>à reculons</strong> par bonds de 10 !</div>
+      <div class="number-line" id="nl3">
+        <div class="num-box filled">80</div>
+        <span class="arrow-right">→</span>
+        <div class="num-box blank"><input type="number" id="nl3-a" placeholder="?"></div>
+        <span class="arrow-right">→</span>
+        <div class="num-box filled">60</div>
+        <span class="arrow-right">→</span>
+        <div class="num-box blank"><input type="number" id="nl3-b" placeholder="?"></div>
+        <span class="arrow-right">→</span>
+        <div class="num-box filled">40</div>
+      </div>
+      <button class="validate-btn" onclick="checkNumberLine('q6', [{id:'nl3-a',val:70},{id:'nl3-b',val:50}])">Vérifier ✓</button>
+      <div class="feedback" id="fb-q6"></div>
+    </div>
+
+    <!-- === EXERCICE 7 : Combiné === -->
+    <div class="card" id="q7" style="display:none">
+      <div class="section-title">🌟 Défi final ! <span class="section-badge">Q7</span></div>
+      <div class="question-text">La <span class="mot">petite</span> lapine saute par bonds de 10.<br>Elle part du nombre <strong>14</strong>. Quel nombre arrive-t-elle après <strong>3 bonds</strong> ?</div>
+      <div class="choices">
+        <button class="choice-btn" onclick="checkChoice(this, '44', 'q7', 'C1')">34</button>
+        <button class="choice-btn" onclick="checkChoice(this, '44', 'q7', 'C2')">44</button>
+        <button class="choice-btn" onclick="checkChoice(this, '44', 'q7', 'C3')">40</button>
+        <button class="choice-btn" onclick="checkChoice(this, '44', 'q7', 'C4')">41</button>
+      </div>
+      <div class="feedback" id="fb-q7"></div>
+    </div>
+  </div>
+
+  <!-- === RÉCOMPENSE === -->
+  <div id="reward-screen">
+    <span class="trophy">🏆</span>
+    <div class="reward-title">Bravo Cassiopée !!!</div>
+    <div class="reward-msg">Tu as tout réussi ! Tu es une vraie championne des mots et des nombres. Papa est super fier de toi ! 💜</div>
+
+    <div class="certificate">
+      <div class="cert-title">Certificat d'excellence</div>
+      <div class="cert-name">Cassiopée</div>
+      <div class="cert-text">
+        a brillamment complété les exercices<br>
+        <strong>Le masculin et le féminin</strong><br>
+        ainsi que les <strong>Bonds de 10</strong> !<br><br>
+        🐰 Une vraie petite lapine savante ! 🌟
+      </div>
+      <div class="confetti-emoji">🎉 🌸 ⭐ 🦋 🌈 🎊 💫</div>
+    </div>
+
+    <button class="restart-btn" onclick="restart()">Recommencer 🔄</button>
+  </div>
+
+</div>
+
+<script>
+  let score = 0;
+  let currentQ = 1;
+  const totalQ = 7;
+
+  const feedbacks = {
+    good: ["Super ! 🌟", "Excellent ! 🎉", "Bravo ! 👏", "Parfait ! 💫", "Magnifique ! 🌸", "Tu es géniale ! ⭐", "Wow ! Trop fort ! 🦋"],
+    bad:  {
+      'q1': "Rappel : on ajoute un « e » à grand → grande 😊",
+      'q2': "La bonne réponse est : le petit lapin est noir. Les mots sont au masculin, pas de « e » ! 😊",
+      'q3': "On ajoute un « e » : joli → jolie ! 😊",
+      'q4': "Rappel : +10 à chaque fois ! 20+10=30, 40+10=50 😊",
+      'q5': "On ajoute 10 à chaque fois : 25, 35, 45, 55, 65... 😊",
+      'q6': "On enlève 10 à chaque fois : 80, 70, 60, 50, 40 😊",
+      'q7': "14 + 10 = 24 → 24 + 10 = 34 → 34 + 10 = 44 ! La lapine arrive à 44 ! 🐰"
+    }
+  };
+
+  function checkChoice(btn, correct, qId, answerId) {
+    const card = document.getElementById(qId);
+    const fb = document.getElementById('fb-' + qId);
+    if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+
+    const allBtns = card.querySelectorAll('.choice-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    if (btn.textContent.trim() === correct) {
+      btn.classList.add('correct-choice');
+      card.classList.add('correct');
+      fb.textContent = feedbacks.good[Math.floor(Math.random() * feedbacks.good.length)];
+      fb.className = 'feedback show good';
+      addScore(qId);
+    } else {
+      btn.classList.add('wrong-choice');
+      card.classList.add('wrong');
+      allBtns.forEach(b => { if (b.textContent.trim() === correct) b.classList.add('correct-choice'); });
+      fb.textContent = feedbacks.bad[qId];
+      fb.className = 'feedback show bad';
+      nextQuestion(qId);
+    }
+  }
+
+  function checkText(qId, correct) {
+    const input = document.getElementById('input-' + qId);
+    const card = document.getElementById(qId);
+    const fb = document.getElementById('fb-' + qId);
+    if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+
+    const userVal = input.value.trim().toLowerCase().replace(/\.$/, '').replace(/\s+/g, ' ');
+    const correctVal = correct.toLowerCase();
+
+    input.disabled = true;
+    card.querySelector('.validate-btn').disabled = true;
+
+    if (userVal === correctVal) {
+      input.classList.add('correct-input');
+      card.classList.add('correct');
+      fb.textContent = feedbacks.good[Math.floor(Math.random() * feedbacks.good.length)];
+      fb.className = 'feedback show good';
+      addScore(qId);
+    } else {
+      input.classList.add('wrong-input');
+      card.classList.add('wrong');
+      fb.textContent = feedbacks.bad[qId];
+      fb.className = 'feedback show bad';
+      nextQuestion(qId);
+    }
+  }
+
+  function checkNumberLine(qId, answers) {
+    const card = document.getElementById(qId);
+    const fb = document.getElementById('fb-' + qId);
+    if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+
+    let allCorrect = true;
+    answers.forEach(a => {
+      const inp = document.getElementById(a.id);
+      if (!inp) return;
+      if (parseInt(inp.value) !== a.val) allCorrect = false;
+    });
+
+    card.querySelector('.validate-btn').disabled = true;
+    answers.forEach(a => { const i = document.getElementById(a.id); if(i) i.disabled = true; });
+
+    if (allCorrect) {
+      card.classList.add('correct');
+      answers.forEach(a => {
+        const inp = document.getElementById(a.id);
+        if (inp) {
+          inp.parentElement.classList.add('filled');
+          inp.parentElement.classList.remove('blank');
+        }
+      });
+      fb.textContent = feedbacks.good[Math.floor(Math.random() * feedbacks.good.length)];
+      fb.className = 'feedback show good';
+      addScore(qId);
+    } else {
+      card.classList.add('wrong');
+      answers.forEach(a => {
+        const inp = document.getElementById(a.id);
+        if (inp) inp.value = a.val;
+      });
+      fb.textContent = feedbacks.bad[qId];
+      fb.className = 'feedback show bad';
+      nextQuestion(qId);
+    }
+  }
+
+  function addScore(qId) {
+    score++;
+    document.getElementById('score-display').textContent = score;
+    updateStars();
+    updateProgress();
+    setTimeout(() => nextQuestion(qId), 1200);
+  }
+
+  function nextQuestion(qId) {
+    const num = parseInt(qId.replace('q', ''));
+    setTimeout(() => {
+      if (num < totalQ) {
+        const next = document.getElementById('q' + (num + 1));
+        if (next) {
+          next.style.display = 'block';
+          next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        setTimeout(showReward, 800);
+      }
+    }, 800);
+  }
+
+  function updateStars() {
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((s, i) => {
+      if (i < score) s.classList.add('earned');
+    });
+  }
+
+  function updateProgress() {
+    const pct = Math.max(5, Math.round((score / totalQ) * 100));
+    document.getElementById('progress-bar').style.width = pct + '%';
+  }
+
+  function showReward() {
+    document.getElementById('main-content').style.display = 'none';
+    const r = document.getElementById('reward-screen');
+    r.classList.add('show');
+    r.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function restart() {
+    score = 0;
+    document.getElementById('score-display').textContent = '0';
+    document.getElementById('progress-bar').style.width = '5%';
+    document.querySelectorAll('.star').forEach(s => s.classList.remove('earned'));
+    document.getElementById('reward-screen').classList.remove('show');
+    document.getElementById('main-content').style.display = 'block';
+
+    // Réinitialiser toutes les cartes
+    for (let i = 1; i <= totalQ; i++) {
+      const card = document.getElementById('q' + i);
+      if (!card) continue;
+      card.classList.remove('correct', 'wrong');
+      card.style.display = i === 1 ? 'block' : 'none';
+      card.querySelectorAll('.choice-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct-choice', 'wrong-choice');
+      });
+      card.querySelectorAll('.validate-btn').forEach(b => b.disabled = false);
+      card.querySelectorAll('input').forEach(inp => {
+        inp.disabled = false;
+        inp.value = '';
+        inp.classList.remove('correct-input', 'wrong-input');
+        const box = inp.parentElement;
+        if (box && box.classList.contains('num-box')) {
+          box.classList.remove('filled');
+          box.classList.add('blank');
+        }
+      });
+      const fb = document.getElementById('fb-q' + i);
+      if (fb) fb.className = 'feedback';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
