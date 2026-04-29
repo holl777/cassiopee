@@ -3,548 +3,489 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jeu des nombres mystères — Cassiopée 🦉</title>
+<title>Maths Aventure — Cassiopée 🛹</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap');
+:root {
+  --jaune:#FFD93D; --rose:#FF6B9D; --vert:#6BCB77; --bleu:#4D96FF;
+  --orange:#FF6B35; --mauve:#C77DFF; --choco:#7B4F2E; --bg:#FFFBF0; --texte:#2D1B69;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--texte); min-height:100vh; overflow-x:hidden; }
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(45deg,rgba(255,217,61,0.07) 0,rgba(255,217,61,0.07) 2px,transparent 2px,transparent 22px),
+    repeating-linear-gradient(-45deg,rgba(255,107,157,0.05) 0,rgba(255,107,157,0.05) 2px,transparent 2px,transparent 22px);
+}
+.container { max-width:740px; margin:0 auto; padding:18px 14px 70px; position:relative; z-index:1; }
 
-  :root {
-    --rose: #FF6B9D;
-    --mauve: #C77DFF;
-    --bleu: #48CAE4;
-    --vert: #80ED99;
-    --jaune: #FFD166;
-    --orange: #FF9F1C;
-    --bg: #FFF5F9;
-    --card: #ffffff;
-    --texte: #3D2C5E;
-  }
+.header {
+  text-align:center; background:linear-gradient(135deg,#FFD93D,#FF6B35,#FF6B9D);
+  border-radius:28px; padding:22px 16px 18px; margin-bottom:20px;
+  box-shadow:0 8px 32px rgba(255,107,53,0.28); position:relative; overflow:hidden; animation:slideDown 0.7s ease;
+}
+.header::before { content:'🛹🚲💃🧁🛹🚲💃🧁'; position:absolute; top:6px; left:0; right:0; font-size:1.2rem; letter-spacing:10px; opacity:0.2; text-align:center; }
+.header h1 { font-family:'Fredoka One',cursive; font-size:2.1rem; color:white; text-shadow:3px 3px 0 rgba(0,0,0,0.15); line-height:1.1; }
+.header p { color:rgba(255,255,255,0.92); font-size:0.9rem; font-weight:700; margin-top:5px; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+.stars { display:flex; justify-content:center; gap:5px; margin:12px 0 8px; }
+.star { font-size:1.5rem; opacity:0.18; transition:all 0.4s; }
+.star.earned { opacity:1; transform:scale(1.2); filter:drop-shadow(0 0 5px gold); animation:starPop 0.4s ease; }
+.progress-wrap { background:#F0E6FF; border-radius:20px; height:13px; overflow:hidden; margin-bottom:4px; }
+.progress-fill { height:100%; border-radius:20px; background:linear-gradient(90deg,var(--jaune),var(--orange),var(--rose)); transition:width 0.6s; min-width:2%; }
+.score-txt { text-align:center; font-family:'Fredoka One',cursive; font-size:0.95rem; color:#9B7EC8; margin-bottom:16px; }
+.score-txt span { font-size:1.3rem; color:var(--mauve); }
 
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    color: var(--texte);
-    overflow-x: hidden;
-  }
+.sep { display:flex; align-items:center; gap:10px; margin:22px 0 14px; }
+.sep-icon { font-size:1.7rem; background:white; border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(0,0,0,0.13); flex-shrink:0; }
+.sep-label { font-family:'Fredoka One',cursive; font-size:1.15rem; padding:6px 18px; border-radius:14px; color:white; }
+.s-blue  { background:linear-gradient(135deg,#4D96FF,#1565C0); }
+.s-green { background:linear-gradient(135deg,#6BCB77,#2E7D32); }
+.s-pink  { background:linear-gradient(135deg,#FF6B9D,#C77DFF); }
 
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(circle at 15% 20%, rgba(255,107,157,0.12) 0%, transparent 40%),
-      radial-gradient(circle at 85% 10%, rgba(199,125,255,0.12) 0%, transparent 35%),
-      radial-gradient(circle at 50% 80%, rgba(72,202,228,0.10) 0%, transparent 40%);
-    pointer-events: none; z-index: 0;
-  }
+.card { background:white; border-radius:22px; padding:18px 16px; margin-bottom:14px; border:3px solid transparent; box-shadow:0 4px 18px rgba(0,0,0,0.07); transition:border-color 0.3s,background 0.3s; animation:fadeUp 0.5s ease both; }
+.card.correct { border-color:var(--vert); background:#F0FFF4; }
+.card.wrong   { border-color:#FF6B6B; background:#FFF5F5; }
 
-  .container { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+.qbadge { display:inline-block; font-family:'Fredoka One',cursive; font-size:0.7rem; padding:2px 10px; border-radius:20px; color:white; margin-bottom:8px; }
+.bb { background:var(--bleu); } .bg { background:var(--vert); } .bp { background:var(--rose); }
+.bc { background:var(--choco); } .bm { background:var(--mauve); } .bo { background:var(--orange); }
 
-  /* HEADER */
-  .header { text-align: center; margin-bottom: 18px; animation: slideDown 0.6s ease; }
-  .header .emoji-top { font-size: 3rem; display: block; margin-bottom: 4px; animation: bounce 2s infinite; }
-  .header h1 {
-    font-family: 'Baloo 2', cursive; font-size: 1.9rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--orange), var(--rose), var(--mauve));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    line-height: 1.2;
-  }
-  .header p { font-size: 0.9rem; color: #8B6DAF; margin-top: 4px; }
+.qt { font-size:1rem; font-weight:800; color:var(--texte); margin-bottom:12px; line-height:1.6; }
+.qt .ac  { color:var(--orange); font-weight:900; }
+.qt .acb { color:var(--bleu);   font-weight:900; }
+.qt .acg { color:var(--vert);   font-weight:900; }
+.qt .acm { color:var(--mauve);  font-weight:900; }
 
-  /* PLAN DE SEMAINE */
-  .plan-box {
-    background: linear-gradient(135deg, #f5f5f0, #e8e8e2);
-    border: 2px solid #9E9E8E;
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 18px;
-    animation: fadeUp 0.5s ease;
-  }
-  .plan-header {
-    background: linear-gradient(90deg, #5a5a5a, #404040);
-    color: white;
-    text-align: center;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-  .plan-header-text h2 { font-family: 'Baloo 2', cursive; font-size: 1.2rem; font-weight: 800; }
-  .plan-header-text p { font-size: 0.8rem; color: #ccc; }
-  .plan-row { display: flex; border-top: 1px solid #ccc; }
-  .plan-label {
-    writing-mode: vertical-lr; transform: rotate(180deg);
-    font-size: 0.65rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
-    display: flex; align-items: center; justify-content: center;
-    padding: 8px 5px; min-width: 24px;
-  }
-  .plan-label.math { background: #81C784; color: #1B5E20; }
-  .plan-content { padding: 10px 12px; flex: 1; font-size: 0.82rem; color: #333; line-height: 1.6; }
-  .plan-content .red { color: #D32F2F; font-weight: 800; }
-  .plan-content ul { margin-left: 14px; }
-  .plan-content ul li { margin-bottom: 3px; }
+.du-scene { background:#F8F4FF; border-radius:16px; padding:12px; margin:10px 0 14px; display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+.du-col { text-align:center; }
+.du-col-label { font-family:'Fredoka One',cursive; font-size:0.72rem; color:#8B6DAF; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.du-eq { font-family:'Fredoka One',cursive; font-size:2rem; color:var(--mauve); align-self:center; }
 
-  /* STARS + PROGRESS */
-  .stars { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; }
-  .star { font-size: 1.5rem; opacity: 0.2; transition: all 0.4s; }
-  .star.earned { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 5px gold); animation: starPop 0.4s ease; }
-  .progress-bar-wrap { background: #EEE0F5; border-radius: 20px; height: 13px; margin-bottom: 6px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--orange), var(--rose), var(--mauve)); transition: width 0.6s; min-width: 3%; }
-  .score-display { text-align: center; font-family: 'Baloo 2', cursive; font-size: 0.9rem; color: #9B7EC8; margin-bottom: 16px; }
-  .score-display span { font-size: 1.25rem; font-weight: 800; color: var(--mauve); }
+.decomp-box { background:#FFF8E6; border:2.5px dashed var(--jaune); border-radius:16px; padding:12px 14px; margin:10px 0 12px; }
+.decomp-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+.decomp-label { font-family:'Fredoka One',cursive; font-size:0.82rem; color:#8B6DAF; min-width:62px; }
+.decomp-count { font-family:'Fredoka One',cursive; font-size:1.1rem; color:var(--orange); }
 
-  /* SECTION TITRE */
-  .section-title {
-    font-family: 'Baloo 2', cursive; font-size: 1.1rem; font-weight: 800;
-    color: var(--texte); margin-bottom: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .badge {
-    background: linear-gradient(135deg, var(--rose), var(--orange));
-    color: white; font-size: 0.62rem; font-weight: 800;
-    padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px;
-  }
+.ii { display:inline-block; width:60px; height:38px; border:2.5px solid #C2A0DC; border-radius:10px; font-family:'Fredoka One',cursive; font-size:1.1rem; text-align:center; color:var(--texte); background:#F9F4FF; outline:none; vertical-align:middle; transition:border-color 0.2s; }
+.ii:focus { border-color:var(--mauve); }
+.ii.ok  { border-color:var(--vert); background:#F0FFF4; }
+.ii.bad { border-color:#FF6B6B; background:#FFF5F5; }
 
-  /* CARTE */
-  .card {
-    background: var(--card); border-radius: 20px; padding: 18px 16px; margin-bottom: 14px;
-    box-shadow: 0 4px 20px rgba(180,100,220,0.10);
-    border: 2px solid transparent; transition: border-color 0.3s;
-    animation: fadeUp 0.5s ease both;
-  }
-  .card.correct { border-color: var(--vert); background: #F0FFF4; }
-  .card.wrong   { border-color: #FF6B6B; background: #FFF5F5; }
+.choices { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.cbtn { background:#F3EBF9; border:2.5px solid #DDD0ED; border-radius:14px; padding:11px 8px; font-family:'Nunito',sans-serif; font-size:1rem; font-weight:800; color:var(--texte); cursor:pointer; transition:all 0.2s; text-align:center; }
+.cbtn:hover:not(:disabled) { background:var(--mauve); color:white; border-color:var(--mauve); transform:scale(1.04); }
+.cbtn.ok  { background:var(--vert); border-color:#52C476; color:#1A5C35; }
+.cbtn.bad { background:#FFB3B3; border-color:#FF6B6B; color:#7A1010; }
 
-  .question-text { font-size: 1rem; font-weight: 700; color: var(--texte); margin-bottom: 12px; line-height: 1.6; }
-  .question-text .mot  { color: var(--mauve); font-weight: 800; }
-  .question-text .num  { color: var(--orange); font-weight: 800; font-size: 1.1rem; }
-  .question-text .hint { color: #8B6DAF; font-size: 0.85rem; font-weight: 600; display: block; margin-top: 4px; }
+.vbtn { background:linear-gradient(135deg,var(--mauve),var(--rose)); color:white; border:none; border-radius:14px; padding:9px 22px; font-family:'Fredoka One',cursive; font-size:1rem; cursor:pointer; transition:transform 0.2s; margin-top:10px; }
+.vbtn:hover:not(:disabled) { transform:scale(1.05); }
+.vbtn:disabled { opacity:0.5; cursor:not-allowed; }
 
-  /* CHOICES */
-  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-  .choice-btn {
-    background: #F3EBF9; border: 2.5px solid #DDD0ED; border-radius: 14px;
-    padding: 11px 8px; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
-    color: var(--texte); cursor: pointer; transition: all 0.2s; text-align: center;
-  }
-  .choice-btn:hover:not(:disabled) { background: var(--mauve); color: white; border-color: var(--mauve); transform: scale(1.04); }
-  .choice-btn.correct-choice { background: var(--vert); border-color: #52C476; color: #1A5C35; }
-  .choice-btn.wrong-choice   { background: #FFB3B3; border-color: #FF6B6B; color: #7A1010; }
+.fb { margin-top:10px; font-size:0.88rem; font-weight:800; border-radius:10px; padding:8px 12px; display:none; line-height:1.5; }
+.fb.show { display:block; animation:pop 0.3s ease; }
+.fb.good { background:#D4F8E0; color:#1A5C35; }
+.fb.bad  { background:#FFE0E0; color:#7A1010; }
 
-  /* NUMBER INPUT INLINE */
-  .inline-input {
-    display: inline-block;
-    width: 58px; height: 36px;
-    border: 2.5px solid #C2A0DC; border-radius: 10px;
-    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 800;
-    text-align: center; color: var(--texte); background: #F9F4FF; outline: none;
-    vertical-align: middle; transition: border-color 0.2s;
-  }
-  .inline-input:focus { border-color: var(--mauve); }
-  .inline-input.ok  { border-color: var(--vert); background: #F0FFF4; }
-  .inline-input.bad { border-color: #FF6B6B; background: #FFF5F5; }
+/* FRACTIONS VISUELS */
+.frac-rect { width:120px; height:52px; border:3px solid var(--texte); overflow:hidden; position:relative; display:inline-block; border-radius:8px; }
+.frac-fill { position:absolute; top:0; left:0; height:100%; }
+.fill-choco { background:linear-gradient(135deg,#A0522D,#4E342E); }
+.fill-blue  { background:linear-gradient(135deg,var(--bleu),var(--mauve)); }
+.fill-green { background:linear-gradient(135deg,var(--vert),#2E7D32); }
+.fill-rose  { background:linear-gradient(135deg,var(--rose),var(--orange)); }
+.fill-jaune { background:linear-gradient(135deg,var(--jaune),var(--orange)); }
+.frac-line-v  { position:absolute; top:0; left:50%; width:3px; height:100%; background:var(--texte); }
+.frac-line-q1 { position:absolute; top:0; left:25%; width:3px; height:100%; background:var(--texte); }
+.frac-line-q2 { position:absolute; top:0; left:50%; width:3px; height:100%; background:var(--texte); }
+.frac-line-q3 { position:absolute; top:0; left:75%; width:3px; height:100%; background:var(--texte); }
+.frac-line-t1 { position:absolute; top:0; left:33%; width:3px; height:100%; background:var(--texte); }
+.frac-line-t2 { position:absolute; top:0; left:66%; width:3px; height:100%; background:var(--texte); }
 
-  /* VALIDATE BTN */
-  .validate-btn {
-    background: linear-gradient(135deg, var(--mauve), var(--rose)); color: white; border: none;
-    border-radius: 14px; padding: 9px 22px; font-family: 'Nunito', sans-serif; font-size: 0.92rem;
-    font-weight: 800; cursor: pointer; transition: transform 0.2s; margin-top: 10px;
-  }
-  .validate-btn:hover:not(:disabled) { transform: scale(1.05); }
-  .validate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.frac-notation { display:inline-flex; flex-direction:column; align-items:center; font-family:'Fredoka One',cursive; font-size:1.3rem; color:var(--texte); line-height:1; }
+.frac-notation .fn { color:var(--rose); font-size:1.5rem; }
+.frac-notation .fb2 { width:26px; height:3px; background:var(--texte); margin:2px 0; border-radius:2px; }
+.frac-notation .fd { color:var(--bleu); font-size:1.5rem; }
 
-  /* FEEDBACK */
-  .feedback { margin-top: 10px; font-size: 0.88rem; font-weight: 700; border-radius: 10px; padding: 8px 12px; display: none; line-height: 1.5; }
-  .feedback.show { display: block; animation: pop 0.3s ease; }
-  .feedback.good { background: #D4F8E0; color: #1A5C35; }
-  .feedback.bad  { background: #FFE0E0; color: #7A1010; }
+.muffin-row { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 12px; }
+.muffin { font-size:2rem; line-height:1; }
+.muffin.eaten { filter:grayscale(1) opacity(0.3); }
 
-  /* DIZAINES/UNITÉS VISUEL */
-  .du-visual {
-    display: flex; gap: 16px; align-items: flex-end; margin: 10px 0; flex-wrap: wrap;
-  }
-  .du-col { text-align: center; }
-  .du-col .du-label { font-size: 0.75rem; font-weight: 800; color: #8B6DAF; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
-  .du-blocks { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; max-width: 140px; }
-  .du-block-10 {
-    width: 18px; height: 60px; background: linear-gradient(180deg, var(--bleu), #2196F3);
-    border-radius: 5px; border: 2px solid #1565C0;
-  }
-  .du-block-1 {
-    width: 18px; height: 18px; background: linear-gradient(135deg, var(--rose), var(--orange));
-    border-radius: 4px; border: 2px solid #C62828;
-  }
-  .du-equals { font-family: 'Baloo 2', cursive; font-size: 1.8rem; font-weight: 800; color: var(--mauve); align-self: center; }
-  .du-result { font-family: 'Baloo 2', cursive; font-size: 2.2rem; font-weight: 800; color: var(--texte); align-self: center; }
+.calc-line { display:flex; align-items:center; gap:10px; margin:8px 0; flex-wrap:wrap; }
+.cnum { font-family:'Fredoka One',cursive; font-size:1.6rem; background:#F3EBF9; border-radius:12px; padding:4px 14px; }
+.cop  { font-family:'Fredoka One',cursive; font-size:1.6rem; color:var(--rose); }
 
-  /* CALCUL LIGNE */
-  .calc-line {
-    display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap;
-  }
-  .calc-num {
-    font-family: 'Baloo 2', cursive; font-size: 1.6rem; font-weight: 800;
-    background: #F3EBF9; border-radius: 12px; padding: 4px 14px; color: var(--texte);
-  }
-  .calc-op { font-family: 'Baloo 2', cursive; font-size: 1.6rem; font-weight: 800; color: var(--rose); }
+.nline { display:flex; align-items:center; gap:4px; margin:10px 0 12px; flex-wrap:wrap; }
+.nbox { width:44px; height:44px; border-radius:11px; background:#F3EBF9; border:2.5px solid #DDD0ED; display:flex; align-items:center; justify-content:center; font-family:'Fredoka One',cursive; font-size:1rem; transition:all 0.3s; }
+.nbox.filled { background:linear-gradient(135deg,var(--bleu),var(--mauve)); border-color:var(--mauve); color:white; }
+.nbox.blank { background:white; border:2.5px dashed #C2A0DC; }
+.nbox input { width:100%; height:100%; border:none; background:transparent; font-family:'Fredoka One',cursive; font-size:0.9rem; text-align:center; color:var(--texte); outline:none; }
+.narr { color:var(--rose); font-size:1.2rem; font-weight:900; }
 
-  /* MYSTÈRE INDICES */
-  .indices { background: #F9F4FF; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
-  .indices ul { list-style: none; }
-  .indices ul li { font-size: 0.92rem; font-weight: 700; color: var(--texte); padding: 4px 0; line-height: 1.4; }
-  .indices ul li::before { content: '🔍 '; }
+/* REWARD */
+#reward-screen { display:none; text-align:center; padding:28px 16px; animation:fadeUp 0.7s ease; }
+#reward-screen.show { display:block; }
+.trophy { font-size:5rem; display:block; animation:bounce 1.5s infinite; margin-bottom:8px; }
+.reward-title { font-family:'Fredoka One',cursive; font-size:2.1rem; background:linear-gradient(135deg,var(--orange),var(--rose),var(--mauve)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1.2; margin-bottom:8px; }
+.reward-msg { font-size:1rem; color:#7A5CA0; line-height:1.7; margin-bottom:20px; }
+.cert { background:linear-gradient(135deg,#FFF9E6,#FFF0F8); border:3px solid var(--jaune); border-radius:22px; padding:20px 16px; margin:0 auto 20px; max-width:420px; position:relative; box-shadow:0 6px 30px rgba(255,209,102,0.3); }
+.cert::before { content:'🌟'; position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:2rem; }
+.cert-title { font-family:'Fredoka One',cursive; font-size:0.95rem; color:var(--orange); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+.cert-name  { font-family:'Fredoka One',cursive; font-size:1.8rem; color:var(--mauve); margin:4px 0; }
+.cert-text  { font-size:0.88rem; color:#6B4E8A; line-height:1.7; }
+.confetti   { font-size:1.3rem; display:flex; justify-content:center; gap:8px; margin-top:8px; animation:fadeIn 1s ease 0.5s both; }
+.rbtn { background:linear-gradient(135deg,var(--bleu),var(--mauve)); color:white; border:none; border-radius:16px; padding:12px 32px; font-family:'Fredoka One',cursive; font-size:1.1rem; cursor:pointer; transition:transform 0.2s; }
+.rbtn:hover { transform:scale(1.05); }
 
-  /* MÉMO INPUTS */
-  .memo-instruction {
-    font-size: 0.88rem; font-weight: 700; color: var(--mauve);
-    background: #F3EBF9; border-radius: 10px; padding: 8px 12px;
-    margin-bottom: 12px; line-height: 1.4;
-  }
-  .memo-input {
-    display: block; width: 100%;
-    padding: 11px 14px; margin-bottom: 8px;
-    border: 2.5px solid #DDD0ED; border-radius: 12px;
-    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700;
-    color: var(--texte); background: #F9F4FF; outline: none;
-    transition: border-color 0.2s;
-  }
-  .memo-input:focus { border-color: var(--mauve); }
-  .memo-input.ok  { border-color: var(--vert); background: #F0FFF4; }
-  .memo-input.bad { border-color: #FF6B6B; background: #FFF5F5; }
-  .memo-tel { letter-spacing: 2px; font-size: 1.15rem; }
-
-  /* REWARD */
-  #reward-screen { display: none; text-align: center; padding: 28px 18px; animation: fadeUp 0.7s ease; }
-  #reward-screen.show { display: block; }
-  .trophy { font-size: 5rem; display: block; animation: bounce 1.5s infinite; margin-bottom: 8px; }
-  .reward-title {
-    font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800;
-    background: linear-gradient(135deg, var(--orange), var(--rose), var(--mauve));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    line-height: 1.2; margin-bottom: 8px;
-  }
-  .reward-msg { font-size: 1rem; color: #7A5CA0; line-height: 1.7; margin-bottom: 20px; }
-
-  /* CADEAU MAMAN */
-  .cadeau-box {
-    background: linear-gradient(135deg, #FFF0F8, #FFE8F5);
-    border: 3px solid var(--rose);
-    border-radius: 22px; padding: 22px 18px; margin: 0 auto 22px; max-width: 420px;
-    position: relative; box-shadow: 0 6px 30px rgba(255,107,157,0.25);
-    animation: pop 0.5s ease;
-  }
-  .cadeau-box::before { content: '💌'; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 2rem; }
-  .cadeau-title { font-family: 'Baloo 2', cursive; font-size: 1rem; color: var(--rose); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-  .cadeau-name  { font-family: 'Baloo 2', cursive; font-size: 1.7rem; font-weight: 800; color: var(--mauve); margin: 4px 0 10px; }
-  .cadeau-info  { font-size: 1.05rem; font-weight: 800; color: var(--texte); line-height: 2; background: white; border-radius: 12px; padding: 10px 14px; border: 2px dashed var(--mauve); }
-  .cadeau-info .label { font-size: 0.75rem; color: #9B7EC8; font-weight: 700; display: block; margin-bottom: -4px; }
-
-  .certificate {
-    background: linear-gradient(135deg, #FFF9E6, #FFF0F8); border: 3px solid var(--jaune);
-    border-radius: 22px; padding: 20px 16px; margin: 0 auto 20px; max-width: 420px;
-    position: relative; box-shadow: 0 6px 30px rgba(255,209,102,0.3);
-  }
-  .certificate::before { content: '🌟'; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 2rem; }
-  .cert-title { font-family: 'Baloo 2', cursive; font-size: 0.95rem; color: var(--orange); font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
-  .cert-name  { font-family: 'Baloo 2', cursive; font-size: 1.8rem; font-weight: 800; color: var(--mauve); margin: 4px 0; }
-  .cert-text  { font-size: 0.88rem; color: #6B4E8A; line-height: 1.6; }
-  .confetti-emoji { font-size: 1.3rem; display: flex; justify-content: center; gap: 8px; margin-top: 8px; animation: fadeIn 1s ease 0.5s both; }
-
-  .restart-btn {
-    background: linear-gradient(135deg, var(--bleu), var(--mauve)); color: white; border: none;
-    border-radius: 16px; padding: 12px 32px; font-family: 'Nunito', sans-serif; font-size: 1rem;
-    font-weight: 800; cursor: pointer; transition: transform 0.2s;
-  }
-  .restart-btn:hover { transform: scale(1.05); }
-
-  /* REVEAL */
-  .reveal-btn {
-    background: linear-gradient(135deg, var(--rose), var(--mauve));
-    color: white; border: none; border-radius: 12px;
-    padding: 10px 22px; font-family: 'Nunito', sans-serif; font-size: 1rem;
-    font-weight: 800; cursor: pointer; transition: transform 0.2s;
-    margin: 6px 0; display: inline-block;
-  }
-  .reveal-btn:hover { transform: scale(1.06); }
-  .reveal-value {
-    font-size: 1.15rem; font-weight: 800; color: var(--texte);
-    background: white; border: 2.5px solid var(--mauve); border-radius: 12px;
-    padding: 8px 16px; display: inline-block; margin: 6px 0;
-    animation: pop 0.4s ease;
-  }
-
-  .reveal-row { margin-top: 6px; }
-  .reveal-btn {
-    background: linear-gradient(135deg, var(--rose), var(--mauve));
-    color: white; border: none; border-radius: 12px;
-    padding: 9px 20px; font-family: 'Nunito', sans-serif;
-    font-size: 0.95rem; font-weight: 800; cursor: pointer;
-    transition: transform 0.2s; width: 100%;
-  }
-  .reveal-btn:hover { transform: scale(1.03); }
-  .reveal-value {
-    font-family: 'Baloo 2', cursive; font-size: 1.25rem; font-weight: 800;
-    color: var(--texte); display: block; margin-top: 6px;
-    background: white; border-radius: 12px; padding: 10px 14px;
-    border: 2.5px solid var(--mauve); animation: pop 0.4s ease;
-    line-height: 1.7;
-  }
-
-  /* ANIMATIONS */
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeUp    { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes bounce    { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-  @keyframes pop       { 0% { transform: scale(0.8); opacity: 0; } 80% { transform: scale(1.06); } 100% { transform: scale(1); opacity: 1; } }
-  @keyframes starPop   { 0% { transform: scale(0.5) rotate(-20deg); } 70% { transform: scale(1.3) rotate(5deg); } 100% { transform: scale(1.15) rotate(0); } }
-  @keyframes fadeIn    { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes bounce    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes pop       { 0%{transform:scale(0.8);opacity:0} 80%{transform:scale(1.06)} 100%{transform:scale(1);opacity:1} }
+@keyframes starPop   { 0%{transform:scale(0.5) rotate(-20deg)} 70%{transform:scale(1.3) rotate(5deg)} 100%{transform:scale(1.15) rotate(0)} }
+@keyframes fadeIn    { from{opacity:0} to{opacity:1} }
 </style>
 </head>
 <body>
 <div class="container">
 <div id="main-content">
 
-  <!-- HEADER -->
-  <div class="header">
-    <span class="emoji-top">🦉</span>
-    <h1>Jeu des nombres mystères !</h1>
-    <p>Semaine du 20 avril 2026 · 0 à 100 · Dizaines et unités · Addition et soustraction</p>
-  </div>
+<div class="header">
+  <h1>🛹 Maths Aventure ! 🚲</h1>
+  <p>Dizaines · Unités · Décomposition · Fractions · 1ère année 💫</p>
+</div>
 
-  <!-- PLAN DE SEMAINE (image) -->
-  <div class="plan-box">
-    <div class="plan-header">
-      <div class="plan-header-text">
-        <h2>Plan de semaine</h2>
-        <p>Du 20 avril 2026</p>
+<div class="stars" id="stars">
+  <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
+  <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
+  <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
+  <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="pbar" style="width:2%"></div></div>
+<div class="score-txt">Score : <span id="sc">0</span> / 12</div>
+
+<!-- PARTIE 1 -->
+<div class="sep"><div class="sep-icon">🚲</div><div class="sep-label s-blue">Partie 1 — Dizaines et Unités</div></div>
+
+<!-- Q1 : lire blocs vélos -->
+<div class="card" id="q1">
+  <span class="qbadge bb">Q1 — Balade à vélo 🚲</span>
+  <div class="qt">Compte les <span class="acb">dizaines</span> et les <span class="ac">unités</span> de vélos !</div>
+  <div class="du-scene">
+    <div class="du-col">
+      <div class="du-col-label">3 dizaines (30)</div>
+      <div style="font-size:1.3rem;line-height:1.7">
+        🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲<br>
+        🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲<br>
+        🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲
       </div>
     </div>
-    <div class="plan-row">
-      <div class="plan-label math">Mathématique</div>
-      <div class="plan-content">
-        <div class="red">Jeu des nombres mystères !</div>
-        <ul>
-          <li>Le chiffre des unités est le même pour 75 et 35. Le chiffre des dizaines est le même pour 14 et 17. <strong>(Réponse 15)</strong></li>
-          <li>4 dizaines de moins que 72. <strong>(Réponse 32)</strong></li>
-          <li>Un 8 est à la position des dizaines. Le chiffre des unités est plus petit que 4 et plus grand que 2. <strong>(Réponse 83)</strong></li>
-          <li>5 dizaines + 2 dizaines et 3 unités + 0 unité. <strong>(Réponse 73)</strong></li>
-          <li>Un 6 est à la position des unités. Le chiffre des dizaines est plus grand que 3 et plus petit que 5. <strong>(Réponse 46)</strong></li>
-        </ul>
+    <div class="du-eq">+</div>
+    <div class="du-col">
+      <div class="du-col-label">4 unités (4)</div>
+      <div style="font-size:1.3rem">🚲🚲🚲🚲</div>
+    </div>
+    <div class="du-eq">=</div>
+    <div style="align-self:center">
+      <input class="ii" id="i1" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:46px">
+    </div>
+  </div>
+  <button class="vbtn" onclick="checkMulti('q1',[{id:'i1',v:34}])">Vérifier ✓</button>
+  <div class="fb" id="fb-q1"></div>
+</div>
+
+<!-- Q2 : décomposer 57 skateboards -->
+<div class="card" id="q2" style="display:none">
+  <span class="qbadge bp">Q2 — Parc de skate 🛹</span>
+  <div class="qt">Il y a <span class="ac">57 skateurs</span>. Décompose ce nombre en dizaines et unités !</div>
+  <div class="decomp-box">
+    <div style="font-size:1.2rem;margin-bottom:10px;line-height:1.6">
+      🛹🛹🛹🛹🛹🛹🛹🛹🛹🛹 &nbsp;🛹🛹🛹🛹🛹🛹🛹🛹🛹🛹 &nbsp;🛹🛹🛹🛹🛹🛹🛹🛹🛹🛹 &nbsp;🛹🛹🛹🛹🛹🛹🛹🛹🛹🛹 &nbsp;🛹🛹🛹🛹🛹🛹🛹🛹🛹🛹 &nbsp;🛹🛹🛹🛹🛹🛹🛹
+    </div>
+    <div class="decomp-row">
+      <span class="decomp-label">Dizaines :</span>
+      <input class="ii" id="i2a" type="number" placeholder="?">
+      <span class="decomp-count">dizaines =</span>
+      <input class="ii" id="i2b" type="number" placeholder="?">
+    </div>
+    <div class="decomp-row">
+      <span class="decomp-label">Unités :</span>
+      <input class="ii" id="i2c" type="number" placeholder="?">
+      <span class="decomp-count">unités</span>
+    </div>
+    <div class="decomp-row" style="margin-top:4px">
+      <span class="decomp-label">Donc :</span>
+      <input class="ii" id="i2d" type="number" placeholder="?">
+      <span class="decomp-count">+</span>
+      <input class="ii" id="i2e" type="number" placeholder="?">
+      <span class="decomp-count">= 57</span>
+    </div>
+  </div>
+  <button class="vbtn" onclick="checkMulti('q2',[{id:'i2a',v:5},{id:'i2b',v:50},{id:'i2c',v:7},{id:'i2d',v:50},{id:'i2e',v:7}])">Vérifier ✓</button>
+  <div class="fb" id="fb-q2"></div>
+</div>
+
+<!-- Q3 : danseuses 63 -->
+<div class="card" id="q3" style="display:none">
+  <span class="qbadge bg">Q3 — Cours de danse 💃</span>
+  <div class="qt">Il y a <span class="acb">6 dizaines</span> et <span class="ac">3 unités</span> de danseuses. Quel est le nombre total ?</div>
+  <div class="du-scene">
+    <div class="du-col">
+      <div class="du-col-label">6 dizaines = 60</div>
+      <div style="font-size:1.1rem;line-height:1.7">
+        💃💃💃💃💃💃💃💃💃💃<br>
+        💃💃💃💃💃💃💃💃💃💃<br>
+        💃💃💃💃💃💃💃💃💃💃<br>
+        💃💃💃💃💃💃💃💃💃💃<br>
+        💃💃💃💃💃💃💃💃💃💃<br>
+        💃💃💃💃💃💃💃💃💃💃
       </div>
     </div>
+    <div class="du-eq">+</div>
+    <div class="du-col">
+      <div class="du-col-label">3 unités = 3</div>
+      <div style="font-size:1.3rem">💃💃💃</div>
+    </div>
+    <div class="du-eq">=</div>
+    <div style="align-self:center">
+      <input class="ii" id="i3" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:46px">
+    </div>
   </div>
+  <button class="vbtn" onclick="checkMulti('q3',[{id:'i3',v:63}])">Vérifier ✓</button>
+  <div class="fb" id="fb-q3"></div>
+</div>
 
-  <!-- STARS + PROGRESS -->
-  <div class="stars" id="stars-display">
-    <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
-    <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
-    <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
+<!-- Q4 : bonds de 10 vélos -->
+<div class="card" id="q4" style="display:none">
+  <span class="qbadge bb">Q4 — Course de vélos 🚲💨</span>
+  <div class="qt">Les vélos avancent par <span class="acb">bonds de 10</span> ! Complète la piste !</div>
+  <div class="nline">
+    <div class="nbox filled">24</div><span class="narr">→</span>
+    <div class="nbox blank"><input type="number" id="n4a" placeholder="?"></div><span class="narr">→</span>
+    <div class="nbox filled">44</div><span class="narr">→</span>
+    <div class="nbox blank"><input type="number" id="n4b" placeholder="?"></div><span class="narr">→</span>
+    <div class="nbox blank"><input type="number" id="n4c" placeholder="?"></div><span class="narr">→</span>
+    <div class="nbox filled">74</div>
   </div>
-  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar" style="width:3%"></div></div>
-  <div class="score-display">Score : <span id="score-display">0</span> / 10</div>
+  <button class="vbtn" onclick="checkNL('q4',[{id:'n4a',v:34},{id:'n4b',v:54},{id:'n4c',v:64}])">Vérifier ✓</button>
+  <div class="fb" id="fb-q4"></div>
+</div>
 
-  <!-- Q1 : Nombre mystère #1 (réponse 15) -->
-  <div class="card" id="q1">
-    <div class="section-title">🔍 Nombre mystère <span class="badge">Q1</span></div>
-    <div class="indices">
-      <ul>
-        <li>Le chiffre des <strong>unités</strong> est le même que dans <strong>75</strong> et <strong>35</strong></li>
-        <li>Le chiffre des <strong>dizaines</strong> est le même que dans <strong>14</strong> et <strong>17</strong></li>
-      </ul>
-    </div>
-    <div class="question-text">Quel est ce nombre mystère ?</div>
-    <div class="choices">
-      <button class="choice-btn" onclick="checkChoice(this,'15','q1')">51</button>
-      <button class="choice-btn" onclick="checkChoice(this,'15','q1')">15</button>
-      <button class="choice-btn" onclick="checkChoice(this,'15','q1')">55</button>
-      <button class="choice-btn" onclick="checkChoice(this,'15','q1')">11</button>
-    </div>
-    <div class="feedback" id="fb-q1"></div>
+<!-- PARTIE 2 -->
+<div class="sep"><div class="sep-icon">🛹</div><div class="sep-label s-green">Partie 2 — Addition et Soustraction</div></div>
+
+<!-- Q5 -->
+<div class="card" id="q5" style="display:none">
+  <span class="qbadge bg">Q5 — Au parc de skate 🛹</span>
+  <div class="qt"><span class="ac">32</span> skateurs le matin + <span class="acb">25</span> l'après-midi. Combien en tout ?</div>
+  <div class="calc-line">
+    <span class="cnum">32</span><span class="cop">+</span><span class="cnum">25</span><span class="cop">=</span>
+    <input class="ii" id="i5" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
   </div>
+  <button class="vbtn" onclick="checkMulti('q5',[{id:'i5',v:57}])">Vérifier ✓</button>
+  <div class="fb" id="fb-q5"></div>
+</div>
 
-  <!-- Q2 : Nombre mystère #2 (réponse 32) -->
-  <div class="card" id="q2" style="display:none">
-    <div class="section-title">🔍 Nombre mystère <span class="badge">Q2</span></div>
-    <div class="indices">
-      <ul>
-        <li>Je suis <strong>4 dizaines de moins</strong> que <strong>72</strong></li>
-      </ul>
-    </div>
-    <div class="question-text">72 a <span class="num">7</span> dizaines. Si on enlève 4 dizaines, il reste combien de dizaines ?</div>
-    <div class="choices">
-      <button class="choice-btn" onclick="checkChoice(this,'32','q2')">42</button>
-      <button class="choice-btn" onclick="checkChoice(this,'32','q2')">72</button>
-      <button class="choice-btn" onclick="checkChoice(this,'32','q2')">32</button>
-      <button class="choice-btn" onclick="checkChoice(this,'32','q2')">22</button>
-    </div>
-    <div class="feedback" id="fb-q2"></div>
+<!-- Q6 -->
+<div class="card" id="q6" style="display:none">
+  <span class="qbadge bp">Q6 — Cours de danse 💃</span>
+  <div class="qt">Il y avait <span class="ac">48</span> danseuses. <span class="acb">13</span> sont parties à vélo. Combien reste-t-il ?</div>
+  <div class="calc-line">
+    <span class="cnum">48</span><span class="cop">-</span><span class="cnum">13</span><span class="cop">=</span>
+    <input class="ii" id="i6" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
   </div>
+  <button class="vbtn" onclick="checkMulti('q6',[{id:'i6',v:35}])">Vérifier ✓</button>
+  <div class="fb" id="fb-q6"></div>
+</div>
 
-  <!-- Q3 : Nombre mystère #3 (réponse 83) -->
-  <div class="card" id="q3" style="display:none">
-    <div class="section-title">🔍 Nombre mystère <span class="badge">Q3</span></div>
-    <div class="indices">
-      <ul>
-        <li>Le chiffre <strong>8</strong> est à la position des <strong>dizaines</strong></li>
-        <li>Le chiffre des <strong>unités</strong> est plus petit que <strong>4</strong> et plus grand que <strong>2</strong></li>
-      </ul>
+<!-- PARTIE 3 FRACTIONS -->
+<div class="sep"><div class="sep-icon">🧁</div><div class="sep-label s-pink">Partie 3 — Les Fractions !</div></div>
+
+<!-- Q7 : 1/2 muffin -->
+<div class="card" id="q7" style="display:none">
+  <span class="qbadge bm">Q7 — Le muffin coupé en 2 🧁</span>
+  <div class="qt">Cassiopée coupe son muffin au chocolat en <span class="acm">2 parties égales</span>. Elle mange <span class="ac">1 partie</span>. Quelle fraction ?</div>
+  <div style="margin:10px 0 14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:0.78rem;font-weight:800;color:#8B6DAF;margin-bottom:5px;text-align:center">Le muffin</div>
+      <div class="frac-rect">
+        <div class="frac-fill fill-choco" style="width:50%"></div>
+        <div class="frac-line-v"></div>
+      </div>
+      <div style="font-size:0.72rem;font-weight:800;color:var(--choco);margin-top:3px;text-align:center">🟫 mangé · ⬜ reste</div>
     </div>
-    <div class="question-text">Quel est ce nombre mystère ?</div>
-    <div class="choices">
-      <button class="choice-btn" onclick="checkChoice(this,'83','q3')">84</button>
-      <button class="choice-btn" onclick="checkChoice(this,'83','q3')">82</button>
-      <button class="choice-btn" onclick="checkChoice(this,'83','q3')">38</button>
-      <button class="choice-btn" onclick="checkChoice(this,'83','q3')">83</button>
-    </div>
-    <div class="feedback" id="fb-q3"></div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1.4rem"> = ?</div>
   </div>
-
-  <!-- Q4 : Dizaines + unités #1 (réponse 73) -->
-  <div class="card" id="q4" style="display:none">
-    <div class="section-title">🧮 Dizaines et unités <span class="badge">Q4</span></div>
-    <div class="question-text">
-      <span class="num">5</span> dizaines + <span class="num">2</span> dizaines = <input class="inline-input" id="diz4" type="number" placeholder="?"> dizaines<br>
-      <span class="num">3</span> unités + <span class="num">0</span> unité = <input class="inline-input" id="uni4" type="number" placeholder="?"> unités<br><br>
-      Donc le nombre est : <input class="inline-input" id="res4" type="number" placeholder="??">
-    </div>
-    <button class="validate-btn" onclick="checkMulti('q4',[{id:'diz4',v:7},{id:'uni4',v:3},{id:'res4',v:73}])">Vérifier ✓</button>
-    <div class="feedback" id="fb-q4"></div>
+  <div class="choices">
+    <button class="cbtn" data-val="1/2" onclick="checkFrac(this,'1/2','q7')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">2</span></div>
+    </button>
+    <button class="cbtn" data-val="1/3" onclick="checkFrac(this,'1/2','q7')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">3</span></div>
+    </button>
+    <button class="cbtn" data-val="2/2" onclick="checkFrac(this,'1/2','q7')">
+      <div class="frac-notation"><span class="fn">2</span><div class="fb2"></div><span class="fd">2</span></div>
+    </button>
+    <button class="cbtn" data-val="1/4" onclick="checkFrac(this,'1/2','q7')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
   </div>
+  <div class="fb" id="fb-q7"></div>
+</div>
 
-  <!-- Q5 : Nombre mystère #5 (réponse 46) -->
-  <div class="card" id="q5" style="display:none">
-    <div class="section-title">🔍 Nombre mystère <span class="badge">Q5</span></div>
-    <div class="indices">
-      <ul>
-        <li>Le chiffre <strong>6</strong> est à la position des <strong>unités</strong></li>
-        <li>Le chiffre des <strong>dizaines</strong> est plus grand que <strong>3</strong> et plus petit que <strong>5</strong></li>
-      </ul>
-    </div>
-    <div class="question-text">Quel est ce nombre mystère ?</div>
-    <div class="choices">
-      <button class="choice-btn" onclick="checkChoice(this,'46','q5')">36</button>
-      <button class="choice-btn" onclick="checkChoice(this,'46','q5')">56</button>
-      <button class="choice-btn" onclick="checkChoice(this,'46','q5')">64</button>
-      <button class="choice-btn" onclick="checkChoice(this,'46','q5')">46</button>
-    </div>
-    <div class="feedback" id="fb-q5"></div>
+<!-- Q8 : 1/4 muffins -->
+<div class="card" id="q8" style="display:none">
+  <span class="qbadge bc">Q8 — Collation spéciale 🧁🧁🧁🧁</span>
+  <div class="qt">Il y a <span class="ac">4 muffins au chocolat</span>. Cassiopée en mange <span class="acb">1</span>. Quelle fraction a-t-elle mangée ?</div>
+  <div class="muffin-row">
+    <span class="muffin eaten">🧁</span>
+    <span class="muffin">🧁</span>
+    <span class="muffin">🧁</span>
+    <span class="muffin">🧁</span>
   </div>
-
-  <!-- Q6 : Addition simple -->
-  <div class="card" id="q6" style="display:none">
-    <div class="section-title">➕ Addition <span class="badge">Q6</span></div>
-    <div class="question-text">Calcule !</div>
-    <div class="calc-line">
-      <span class="calc-num">34</span>
-      <span class="calc-op">+</span>
-      <span class="calc-num">25</span>
-      <span class="calc-op">=</span>
-      <input class="inline-input" id="add1" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
-    </div>
-    <div class="calc-line">
-      <span class="calc-num">51</span>
-      <span class="calc-op">+</span>
-      <span class="calc-num">18</span>
-      <span class="calc-op">=</span>
-      <input class="inline-input" id="add2" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
-    </div>
-    <button class="validate-btn" onclick="checkMulti('q6',[{id:'add1',v:59},{id:'add2',v:69}])">Vérifier ✓</button>
-    <div class="feedback" id="fb-q6"></div>
+  <div style="font-size:0.8rem;font-weight:800;color:#8B6DAF;margin-bottom:12px">🩶 = mangé</div>
+  <div class="choices">
+    <button class="cbtn" data-val="1/2" onclick="checkFrac(this,'1/4','q8')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">2</span></div>
+    </button>
+    <button class="cbtn" data-val="4/4" onclick="checkFrac(this,'1/4','q8')">
+      <div class="frac-notation"><span class="fn">4</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
+    <button class="cbtn" data-val="2/4" onclick="checkFrac(this,'1/4','q8')">
+      <div class="frac-notation"><span class="fn">2</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
+    <button class="cbtn" data-val="1/4" onclick="checkFrac(this,'1/4','q8')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
   </div>
+  <div class="fb" id="fb-q8"></div>
+</div>
 
-  <!-- Q7 : Soustraction simple -->
-  <div class="card" id="q7" style="display:none">
-    <div class="section-title">➖ Soustraction <span class="badge">Q7</span></div>
-    <div class="question-text">Calcule !</div>
-    <div class="calc-line">
-      <span class="calc-num">87</span>
-      <span class="calc-op">-</span>
-      <span class="calc-num">40</span>
-      <span class="calc-op">=</span>
-      <input class="inline-input" id="sub1" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
+<!-- Q9 : 1/3 piste de danse -->
+<div class="card" id="q9" style="display:none">
+  <span class="qbadge bp">Q9 — Piste de danse 💃🛹</span>
+  <div class="qt">La piste est divisée en <span class="acm">3 parties égales</span>. Les skateurs occupent <span class="ac">1 partie</span>. Quelle fraction ?</div>
+  <div style="margin:10px 0 14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:0.78rem;font-weight:800;color:#8B6DAF;margin-bottom:5px;text-align:center">La piste</div>
+      <div class="frac-rect" style="width:150px">
+        <div class="frac-fill fill-blue" style="width:33.33%"></div>
+        <div class="frac-line-t1"></div>
+        <div class="frac-line-t2"></div>
+      </div>
+      <div style="font-size:0.72rem;font-weight:800;color:var(--bleu);margin-top:3px;text-align:center">🟦 skateurs · ⬜ libre</div>
     </div>
-    <div class="calc-line">
-      <span class="calc-num">63</span>
-      <span class="calc-op">-</span>
-      <span class="calc-num">21</span>
-      <span class="calc-op">=</span>
-      <input class="inline-input" id="sub2" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
-    </div>
-    <button class="validate-btn" onclick="checkMulti('q7',[{id:'sub1',v:47},{id:'sub2',v:42}])">Vérifier ✓</button>
-    <div class="feedback" id="fb-q7"></div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1.4rem"> = ?</div>
   </div>
+  <div class="choices">
+    <button class="cbtn" data-val="3/3" onclick="checkFrac(this,'1/3','q9')">
+      <div class="frac-notation"><span class="fn">3</span><div class="fb2"></div><span class="fd">3</span></div>
+    </button>
+    <button class="cbtn" data-val="1/2" onclick="checkFrac(this,'1/3','q9')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">2</span></div>
+    </button>
+    <button class="cbtn" data-val="1/3" onclick="checkFrac(this,'1/3','q9')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">3</span></div>
+    </button>
+    <button class="cbtn" data-val="2/3" onclick="checkFrac(this,'1/3','q9')">
+      <div class="frac-notation"><span class="fn">2</span><div class="fb2"></div><span class="fd">3</span></div>
+    </button>
+  </div>
+  <div class="fb" id="fb-q9"></div>
+</div>
 
-  <!-- Q8 : Dizaines/unités visuel -->
-  <div class="card" id="q8" style="display:none">
-    <div class="section-title">🧮 Combien de dizaines et d'unités ? <span class="badge">Q8</span></div>
-    <div class="question-text">Regarde les blocs et écris le nombre !</div>
-    <div class="du-visual">
-      <div class="du-col">
-        <div class="du-label">Dizaines</div>
-        <div class="du-blocks">
-          <div class="du-block-10"></div>
-          <div class="du-block-10"></div>
-          <div class="du-block-10"></div>
-          <div class="du-block-10"></div>
-          <div class="du-block-10"></div>
-          <div class="du-block-10"></div>
+<!-- Q10 : 2/4 muffins -->
+<div class="card" id="q10" style="display:none">
+  <span class="qbadge bc">Q10 — Encore des muffins ! 🧁</span>
+  <div class="qt">Il y a <span class="ac">4 muffins</span>. Cassiopée et son amie en mangent <span class="acb">2 en tout</span>. Quelle fraction ?</div>
+  <div class="muffin-row">
+    <span class="muffin eaten">🧁</span>
+    <span class="muffin eaten">🧁</span>
+    <span class="muffin">🧁</span>
+    <span class="muffin">🧁</span>
+  </div>
+  <div class="choices">
+    <button class="cbtn" data-val="1/4" onclick="checkFrac(this,'2/4','q10')">
+      <div class="frac-notation"><span class="fn">1</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
+    <button class="cbtn" data-val="3/4" onclick="checkFrac(this,'2/4','q10')">
+      <div class="frac-notation"><span class="fn">3</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
+    <button class="cbtn" data-val="2/4" onclick="checkFrac(this,'2/4','q10')">
+      <div class="frac-notation"><span class="fn">2</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
+    <button class="cbtn" data-val="4/4" onclick="checkFrac(this,'2/4','q10')">
+      <div class="frac-notation"><span class="fn">4</span><div class="fb2"></div><span class="fd">4</span></div>
+    </button>
+  </div>
+  <div class="fb" id="fb-q10"></div>
+</div>
+
+<!-- Q11 : quel dessin montre 1/2 -->
+<div class="card" id="q11" style="display:none">
+  <span class="qbadge bm">Q11 — Quel dessin montre 1/2 ? 🎨</span>
+  <div class="qt">Lequel de ces dessins montre exactement <span class="acm">une moitié (1/2)</span> en couleur ?</div>
+  <div class="choices">
+    <button class="cbtn" data-val="A" onclick="checkFrac(this,'B','q11')" style="padding:14px 6px">
+      <div style="text-align:center">
+        <div class="frac-rect" style="width:88px;height:38px;margin:0 auto 5px">
+          <div class="frac-fill fill-jaune" style="width:33%"></div>
+          <div class="frac-line-t1"></div><div class="frac-line-t2"></div>
         </div>
+        <div style="font-size:0.75rem;font-weight:800;color:#8B6DAF">A — 1/3</div>
       </div>
-      <div class="du-col">
-        <div class="du-label">Unités</div>
-        <div class="du-blocks">
-          <div class="du-block-1"></div>
-          <div class="du-block-1"></div>
-          <div class="du-block-1"></div>
-          <div class="du-block-1"></div>
+    </button>
+    <button class="cbtn" data-val="B" onclick="checkFrac(this,'B','q11')" style="padding:14px 6px">
+      <div style="text-align:center">
+        <div class="frac-rect" style="width:88px;height:38px;margin:0 auto 5px">
+          <div class="frac-fill fill-green" style="width:50%"></div>
+          <div class="frac-line-v"></div>
         </div>
+        <div style="font-size:0.75rem;font-weight:800;color:#8B6DAF">B — 1/2 ✓</div>
       </div>
-      <div class="du-equals">=</div>
-      <div>
-        <input class="inline-input" id="vis8" type="number" placeholder="??" style="width:70px;font-size:1.4rem;height:48px">
+    </button>
+    <button class="cbtn" data-val="C" onclick="checkFrac(this,'B','q11')" style="padding:14px 6px">
+      <div style="text-align:center">
+        <div class="frac-rect" style="width:88px;height:38px;margin:0 auto 5px">
+          <div class="frac-fill fill-rose" style="width:75%"></div>
+          <div class="frac-line-q1"></div><div class="frac-line-q2"></div><div class="frac-line-q3"></div>
+        </div>
+        <div style="font-size:0.75rem;font-weight:800;color:#8B6DAF">C — 3/4</div>
       </div>
-    </div>
-    <button class="validate-btn" onclick="checkMulti('q8',[{id:'vis8',v:64}])">Vérifier ✓</button>
-    <div class="feedback" id="fb-q8"></div>
+    </button>
+    <button class="cbtn" data-val="D" onclick="checkFrac(this,'B','q11')" style="padding:14px 6px">
+      <div style="text-align:center">
+        <div class="frac-rect" style="width:88px;height:38px;margin:0 auto 5px">
+          <div class="frac-fill fill-choco" style="width:25%"></div>
+          <div class="frac-line-q1"></div><div class="frac-line-q2"></div><div class="frac-line-q3"></div>
+        </div>
+        <div style="font-size:0.75rem;font-weight:800;color:#8B6DAF">D — 1/4</div>
+      </div>
+    </button>
   </div>
+  <div class="fb" id="fb-q11"></div>
+</div>
 
-  <!-- Q9 : Problème + addition -->
-  <div class="card" id="q9" style="display:none">
-    <div class="section-title">🐇 Problème d'addition <span class="badge">Q9</span></div>
-    <div class="question-text">
-      Cassiopée a <span class="num">45</span> billes.<br>
-      Son amie lui en donne <span class="num">23</span> de plus.<br>
-      Combien Cassiopée a-t-elle de billes en tout ?
-    </div>
-    <div class="calc-line">
-      <span class="calc-num">45</span>
-      <span class="calc-op">+</span>
-      <span class="calc-num">23</span>
-      <span class="calc-op">=</span>
-      <input class="inline-input" id="prob9" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
-    </div>
-    <button class="validate-btn" onclick="checkMulti('q9',[{id:'prob9',v:68}])">Vérifier ✓</button>
-    <div class="feedback" id="fb-q9"></div>
+<!-- Q12 : défi final -->
+<div class="card" id="q12" style="display:none">
+  <span class="qbadge bo">Q12 — 🏆 Défi final !</span>
+  <div class="qt">
+    Après la balade à vélo, <span class="ac">3 amis</span> partagent <span class="acb">6 muffins au chocolat</span> en parts égales.<br>
+    Chaque ami mange combien de muffins ?<br>
+    <span style="font-size:0.85rem;color:#8B6DAF;font-weight:700">Indice : 6 ÷ 3 = ?</span>
   </div>
-
-  <!-- Q10 : Problème soustraction -->
-  <div class="card" id="q10" style="display:none">
-    <div class="section-title">🏆 Défi final ! <span class="badge">Q10</span></div>
-    <div class="question-text">
-      Il y a <span class="num">76</span> élèves dans l'école.<br>
-      <span class="num">32</span> élèves sont dehors.<br>
-      Combien d'élèves sont encore à l'intérieur ?
-    </div>
-    <div class="calc-line">
-      <span class="calc-num">76</span>
-      <span class="calc-op">-</span>
-      <span class="calc-num">32</span>
-      <span class="calc-op">=</span>
-      <input class="inline-input" id="prob10" type="number" placeholder="??" style="width:70px;font-size:1.3rem;height:44px">
-    </div>
-    <button class="validate-btn" onclick="checkMulti('q10',[{id:'prob10',v:44}])">Vérifier ✓</button>
-    <div class="feedback" id="fb-q10"></div>
+  <div class="muffin-row" style="justify-content:center">
+    <span class="muffin">🧁</span><span class="muffin">🧁</span><span class="muffin">🧁</span>
+    <span class="muffin">🧁</span><span class="muffin">🧁</span><span class="muffin">🧁</span>
   </div>
+  <div class="choices">
+    <button class="cbtn" data-val="1" onclick="checkChoice2(this,'2','q12')">1 muffin 🧁</button>
+    <button class="cbtn" data-val="2" onclick="checkChoice2(this,'2','q12')">2 muffins 🧁🧁</button>
+    <button class="cbtn" data-val="3" onclick="checkChoice2(this,'2','q12')">3 muffins 🧁🧁🧁</button>
+    <button class="cbtn" data-val="6" onclick="checkChoice2(this,'2','q12')">6 muffins 🧁🧁🧁🧁🧁🧁</button>
+  </div>
+  <div class="fb" id="fb-q12"></div>
+</div>
 
 </div><!-- fin main-content -->
 
@@ -553,223 +494,170 @@
   <span class="trophy">🏆</span>
   <div class="reward-title">Bravo Cassiopée !!!</div>
   <div class="reward-msg">
-    Tu as résolu tous les nombres mystères et tous les calculs !<br>
-    Tu es une vraie championne ! Papa est tellement fier de toi. 💜<br><br>
-    Et pour te récompenser... voici un cadeau spécial ! 🎁
+    Tu as maîtrisé les dizaines, les unités ET les fractions !<br>
+    Tu mérites une vraie collation de muffins au chocolat ! 🧁🧁🧁<br>
+    Papa est tellement fier de toi ! 💜
   </div>
-
-  <!-- CADEAU MAMAN -->
-  <div class="cadeau-box">
-    <div class="cadeau-title">Cadeau surprise 🎁</div>
-    <div class="cadeau-name">Maman Marisol 💜</div>
-    <div class="cadeau-info">
-      <div class="memo-instruction">✏️ Papa va te lire l'adresse et le numéro. Écris-les toi-même pour t'en souvenir !</div>
-
-      <span class="label">📍 Adresse de maman</span>
-      <input class="memo-input" id="memo-adresse" type="text" placeholder="Numéro et rue...">
-      <input class="memo-input" id="memo-ville" type="text" placeholder="Ville et code postal...">
-
-      <span class="label" style="margin-top:10px;display:block">📞 Numéro de téléphone de maman</span>
-      <input class="memo-input memo-tel" id="memo-tel" type="tel" placeholder="___-___-____" maxlength="12">
-
-      <button class="validate-btn" style="margin-top:12px;width:100%" onclick="checkMemo()">Vérifier ✓</button>
-      <div class="feedback" id="fb-memo"></div>
-
-      <div id="memo-success" style="display:none">
-        <div style="margin-top:14px;background:#D4F8E0;border-radius:14px;padding:14px;font-weight:800;color:#1A5C35;font-size:1rem;line-height:1.8">
-          ✅ Bravo ! Tu t'en souviens !<br>
-          📍 <strong>249 rue Judith-Jasmin</strong><br>
-          <strong>Lévis, G7A 3K5</strong><br>
-          📞 <strong>418-905-3476</strong>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="certificate">
+  <div class="cert">
     <div class="cert-title">Certificat d'excellence</div>
     <div class="cert-name">Cassiopée</div>
     <div class="cert-text">
-      a brillamment réussi les exercices<br>
-      <strong>Jeu des nombres mystères</strong><br>
-      <strong>Dizaines et unités</strong><br>
-      <strong>Addition et soustraction</strong><br><br>
-      🦉 Une vraie mathématicienne ! ⭐
+      a brillamment réussi<br>
+      <strong>🚲 Dizaines et Unités</strong><br>
+      <strong>🛹 Addition et Soustraction</strong><br>
+      <strong>🧁 Fractions de 1ère année</strong><br><br>
+      💃 Une vraie championne des maths !
     </div>
-    <div class="confetti-emoji">🎉 🌸 ⭐ 🦋 🌈 🎊 💫</div>
+    <div class="confetti">🎉 🌸 ⭐ 🛹 🚲 💃 🧁 🎊</div>
   </div>
-
-  <button class="restart-btn" onclick="restart()">Recommencer 🔄</button>
+  <button class="rbtn" onclick="restart()">Recommencer 🔄</button>
 </div>
 
-</div><!-- container -->
-
+</div>
 <script>
-  let score = 0;
-  const totalQ = 10;
+let score = 0;
+const totalQ = 12;
+const goodMsg = ["Super ! 🌟","Excellent ! 🎉","Bravo ! 👏","Parfait ! 💫","Magnifique ! 🌸","Tu es géniale ! ⭐","Wow trop fort ! 🛹","Incroyable ! 🚲","C'est ça ! 💃","À la perfection ! 🧁","Ouiii !! 🎊","Tu gères ! 🏅"];
+const badMsg = {
+  q1:"3 dizaines = 30, 4 unités = 4. Donc 30 + 4 = 34 ! 🚲",
+  q2:"57 = 5 dizaines (50) + 7 unités (7). 50 + 7 = 57 ! 🛹",
+  q3:"6 dizaines = 60, 3 unités = 3. 60 + 3 = 63 ! 💃",
+  q4:"On ajoute 10 à chaque fois : 24 → 34 → 44 → 54 → 64 → 74 ! 🚲",
+  q5:"32 + 25 : 30+20=50, 2+5=7 → 57 ! 🛹",
+  q6:"48 - 13 : 40-10=30, 8-3=5 → 35 ! 💃",
+  q7:"Coupé en 2 parties égales, 1 mangée → 1/2 ! 🧁",
+  q8:"1 muffin mangé sur 4 → 1/4 ! 🧁",
+  q9:"Piste en 3 parties, 1 occupée → 1/3 ! 💃🛹",
+  q10:"2 muffins mangés sur 4 → 2/4 ! 🧁",
+  q11:"Le dessin B montre la moitié (1/2) exactement ! 🎨",
+  q12:"6 ÷ 3 = 2 muffins chacun ! 🧁🧁"
+};
 
-  const goodMsg = ["Super ! 🌟","Excellent ! 🎉","Bravo ! 👏","Parfait ! 💫","Magnifique ! 🌸","Tu es géniale ! ⭐","Wow ! Trop fort ! 🦋","Incroyable ! 🌈","C'est exactement ça ! 🏅","À la perfection ! 🦄"];
-  const badMsg = {
-    q1: "Unités de 75 = 5, unités de 35 = 5 → 5 en unités. Dizaines de 14 = 1, dizaines de 17 = 1 → 1 en dizaines. Réponse : 15 ! 😊",
-    q2: "72 = 7 dizaines. 7 dizaines - 4 dizaines = 3 dizaines. Avec 2 unités → 32 ! 😊",
-    q3: "Dizaines = 8, unités entre 2 et 4 → seul 3 convient ! Réponse : 83 ! 😊",
-    q4: "5 + 2 = 7 dizaines, 3 + 0 = 3 unités → 73 ! 😊",
-    q5: "Unités = 6, dizaines entre 3 et 5 → seul 4 convient ! Réponse : 46 ! 😊",
-    q6: "34+25 : 30+20=50, 4+5=9 → 59. Et 51+18 : 50+10=60, 1+8=9 → 69 ! 😊",
-    q7: "87-40 : on enlève 4 dizaines → 47. Et 63-21 : 60-20=40, 3-1=2 → 42 ! 😊",
-    q8: "6 blocs bleus = 6 dizaines = 60. 4 petits blocs = 4 unités. 60 + 4 = 64 ! 😊",
-    q9: "45 + 23 : 40+20=60, 5+3=8 → 68 billes ! 😊",
-    q10: "76 - 32 : 70-30=40, 6-2=4 → 44 élèves à l'intérieur ! 😊"
-  };
+function good() { return goodMsg[Math.floor(Math.random()*goodMsg.length)]; }
 
-  function good() { return goodMsg[Math.floor(Math.random()*goodMsg.length)]; }
-
-  function checkMemo() {
-    const adresse = document.getElementById('memo-adresse').value.trim().toLowerCase().replace(/\s+/g,' ');
-    const ville   = document.getElementById('memo-ville').value.trim().toLowerCase().replace(/\s+/g,' ');
-    const tel     = document.getElementById('memo-tel').value.trim().replace(/\s/g,'');
-
-    const okAdresse = adresse.includes('judith') && adresse.includes('jasmin') && adresse.includes('249');
-    const okVille   = ville.includes('lévis') || ville.includes('levis');
-    const okTel     = tel.replace(/-/g,'') === '4189053476';
-
-    const inpA = document.getElementById('memo-adresse');
-    const inpV = document.getElementById('memo-ville');
-    const inpT = document.getElementById('memo-tel');
-    const fb   = document.getElementById('fb-memo');
-
-    inpA.classList.toggle('ok', okAdresse); inpA.classList.toggle('bad', !okAdresse);
-    inpV.classList.toggle('ok', okVille);   inpV.classList.toggle('bad', !okVille);
-    inpT.classList.toggle('ok', okTel);     inpT.classList.toggle('bad', !okTel);
-
-    if (okAdresse && okVille && okTel) {
-      fb.textContent = '';
-      fb.className = 'feedback';
-      document.getElementById('memo-success').style.display = 'block';
-      document.querySelector('#reward-screen .validate-btn').disabled = true;
-    } else {
-      let msg = 'Essaie encore ! ';
-      if (!okAdresse) msg += '🏠 Vérifie le numéro et la rue. ';
-      if (!okVille)   msg += '🏙️ Vérifie la ville. ';
-      if (!okTel)     msg += '📞 Vérifie le numéro de téléphone (418-905-3476). ';
-      fb.textContent = msg;
-      fb.className = 'feedback show bad';
-    }
+function checkFrac(btn, correct, qId) {
+  const card = document.getElementById(qId);
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  const all = card.querySelectorAll('.cbtn');
+  all.forEach(b => b.disabled = true);
+  const chosen = btn.dataset.val;
+  if (chosen === correct) {
+    btn.classList.add('ok'); card.classList.add('correct');
+    showFb(qId, good(), true); addScore(qId);
+  } else {
+    btn.classList.add('bad'); card.classList.add('wrong');
+    all.forEach(b => { if (b.dataset.val === correct) b.classList.add('ok'); });
+    showFb(qId, badMsg[qId], false);
+    setTimeout(() => next(qId), 1700);
   }
+}
 
-  function checkChoice(btn, correct, qId) {
-    const card = document.getElementById(qId);
-    if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
-    const all = card.querySelectorAll('.choice-btn');
-    all.forEach(b => b.disabled = true);
-    if (btn.textContent.trim() === correct) {
-      btn.classList.add('correct-choice');
-      card.classList.add('correct');
-      showFb(qId, good(), true);
-      addScore(qId);
-    } else {
-      btn.classList.add('wrong-choice');
-      all.forEach(b => { if (b.textContent.trim() === correct) b.classList.add('correct-choice'); });
-      card.classList.add('wrong');
-      showFb(qId, badMsg[qId], false);
-      setTimeout(() => next(qId), 1600);
-    }
+function checkChoice2(btn, correct, qId) {
+  const card = document.getElementById(qId);
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  const all = card.querySelectorAll('.cbtn');
+  all.forEach(b => b.disabled = true);
+  if (btn.dataset.val === correct) {
+    btn.classList.add('ok'); card.classList.add('correct');
+    showFb(qId, good(), true); addScore(qId);
+  } else {
+    btn.classList.add('bad'); card.classList.add('wrong');
+    all.forEach(b => { if (b.dataset.val === correct) b.classList.add('ok'); });
+    showFb(qId, badMsg[qId], false);
+    setTimeout(() => next(qId), 1700);
   }
+}
 
-  function checkMulti(qId, answers) {
-    const card = document.getElementById(qId);
-    if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
-    let ok = true;
-    answers.forEach(a => { if (parseInt(document.getElementById(a.id).value) !== a.v) ok = false; });
-    card.querySelectorAll('.validate-btn').forEach(b => b.disabled = true);
-    answers.forEach(a => { const i = document.getElementById(a.id); if(i) i.disabled = true; });
-    if (ok) {
-      card.classList.add('correct');
-      answers.forEach(a => { const i = document.getElementById(a.id); if(i) i.classList.add('ok'); });
-      showFb(qId, good(), true);
-      addScore(qId);
-    } else {
-      card.classList.add('wrong');
-      answers.forEach(a => { const i = document.getElementById(a.id); if(i) { i.classList.add('bad'); i.value = a.v; } });
-      showFb(qId, badMsg[qId], false);
-      setTimeout(() => next(qId), 1800);
-    }
+function checkMulti(qId, answers) {
+  const card = document.getElementById(qId);
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  let ok = true;
+  answers.forEach(a => { if (parseInt(document.getElementById(a.id)?.value) !== a.v) ok = false; });
+  card.querySelectorAll('.vbtn').forEach(b => b.disabled = true);
+  answers.forEach(a => { const i = document.getElementById(a.id); if(i) i.disabled = true; });
+  if (ok) {
+    card.classList.add('correct');
+    answers.forEach(a => { const i = document.getElementById(a.id); if(i) i.classList.add('ok'); });
+    showFb(qId, good(), true); addScore(qId);
+  } else {
+    card.classList.add('wrong');
+    answers.forEach(a => { const i = document.getElementById(a.id); if(i) { i.classList.add('bad'); i.value = a.v; } });
+    showFb(qId, badMsg[qId], false);
+    setTimeout(() => next(qId), 1800);
   }
+}
 
-  function showFb(qId, msg, isGood) {
-    const fb = document.getElementById('fb-' + qId);
-    if (!fb) return;
-    fb.textContent = msg;
-    fb.className = 'feedback show ' + (isGood ? 'good' : 'bad');
+function checkNL(qId, answers) {
+  const card = document.getElementById(qId);
+  if (card.classList.contains('correct') || card.classList.contains('wrong')) return;
+  let ok = true;
+  answers.forEach(a => { if (parseInt(document.getElementById(a.id)?.value) !== a.v) ok = false; });
+  card.querySelector('.vbtn').disabled = true;
+  answers.forEach(a => { const i = document.getElementById(a.id); if(i) i.disabled = true; });
+  if (ok) {
+    card.classList.add('correct');
+    answers.forEach(a => { const i = document.getElementById(a.id); if(i) { i.parentElement.classList.add('filled'); i.parentElement.classList.remove('blank'); } });
+    showFb(qId, good(), true); addScore(qId);
+  } else {
+    card.classList.add('wrong');
+    answers.forEach(a => { const i = document.getElementById(a.id); if(i) i.value = a.v; });
+    showFb(qId, badMsg[qId], false);
+    setTimeout(() => next(qId), 1800);
   }
+}
 
-  function addScore(qId) {
-    score++;
-    document.getElementById('score-display').textContent = score;
-    updateStars();
-    updateProgress();
-    setTimeout(() => next(qId), 1100);
-  }
+function showFb(qId, msg, isGood) {
+  const fb = document.getElementById('fb-'+qId);
+  if (!fb) return;
+  fb.textContent = msg;
+  fb.className = 'fb show ' + (isGood ? 'good' : 'bad');
+}
 
-  function next(qId) {
-    const num = parseInt(qId.replace('q',''));
-    if (num < totalQ) {
-      const nx = document.getElementById('q'+(num+1));
-      if (nx) { nx.style.display = 'block'; setTimeout(() => nx.scrollIntoView({behavior:'smooth',block:'center'}), 60); }
-    } else {
-      setTimeout(showReward, 800);
-    }
-  }
+function addScore(qId) {
+  score++;
+  document.getElementById('sc').textContent = score;
+  document.querySelectorAll('.star').forEach((s,i) => { if (i < score) s.classList.add('earned'); });
+  document.getElementById('pbar').style.width = Math.max(2, Math.round(score/totalQ*100)) + '%';
+  setTimeout(() => next(qId), 1100);
+}
 
-  function updateStars() {
-    document.querySelectorAll('.star').forEach((s,i) => { if (i < score) s.classList.add('earned'); });
+function next(qId) {
+  const num = parseInt(qId.replace('q',''));
+  if (num < totalQ) {
+    const nx = document.getElementById('q'+(num+1));
+    if (nx) { nx.style.display = 'block'; setTimeout(() => nx.scrollIntoView({behavior:'smooth',block:'center'}), 60); }
+  } else {
+    setTimeout(() => {
+      document.getElementById('main-content').style.display = 'none';
+      const r = document.getElementById('reward-screen');
+      r.classList.add('show'); r.scrollIntoView({behavior:'smooth'});
+    }, 800);
   }
+}
 
-  function updateProgress() {
-    document.getElementById('progress-bar').style.width = Math.max(3, Math.round(score/totalQ*100)) + '%';
+function restart() {
+  score = 0;
+  document.getElementById('sc').textContent = '0';
+  document.getElementById('pbar').style.width = '2%';
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('earned'));
+  document.getElementById('reward-screen').classList.remove('show');
+  document.getElementById('main-content').style.display = 'block';
+  for (let i=1; i<=totalQ; i++) {
+    const card = document.getElementById('q'+i);
+    if (!card) continue;
+    card.classList.remove('correct','wrong');
+    card.style.display = i===1 ? 'block' : 'none';
+    card.querySelectorAll('.cbtn').forEach(b => { b.disabled=false; b.classList.remove('ok','bad'); });
+    card.querySelectorAll('.vbtn').forEach(b => b.disabled=false);
+    card.querySelectorAll('input').forEach(inp => {
+      inp.disabled=false; inp.value=''; inp.classList.remove('ok','bad');
+      const box = inp.parentElement;
+      if (box?.classList.contains('nbox')) { box.classList.remove('filled'); box.classList.add('blank'); }
+    });
+    document.getElementById('fb-q'+i).className = 'fb';
   }
-
-  function showReward() {
-    document.getElementById('main-content').style.display = 'none';
-    const r = document.getElementById('reward-screen');
-    r.classList.add('show');
-    r.scrollIntoView({behavior:'smooth'});
-  }
-
-  function reveal(key, text) {
-    const btn = document.querySelector('#reveal-' + key + ' .reveal-btn');
-    const val = document.getElementById('val-' + key);
-    if (btn) btn.style.display = 'none';
-    if (val) { val.style.display = 'block'; }
-  }
-
-  function reveal(key, text) {
-    const btn = document.querySelector(`#reveal-${key} .reveal-btn`);
-    const val = document.getElementById(`val-${key}`);
-    if (btn) btn.style.display = 'none';
-    if (val) val.style.display = 'inline-block';
-  }
-
-  function restart() {
-    score = 0;
-    document.getElementById('score-display').textContent = '0';
-    document.getElementById('progress-bar').style.width = '3%';
-    document.querySelectorAll('.star').forEach(s => s.classList.remove('earned'));
-    document.getElementById('reward-screen').classList.remove('show');
-    document.getElementById('main-content').style.display = 'block';
-    for (let i=1; i<=totalQ; i++) {
-      const card = document.getElementById('q'+i);
-      if (!card) continue;
-      card.classList.remove('correct','wrong');
-      card.style.display = i===1 ? 'block' : 'none';
-      card.querySelectorAll('.choice-btn').forEach(b => { b.disabled=false; b.classList.remove('correct-choice','wrong-choice'); });
-      card.querySelectorAll('.validate-btn').forEach(b => b.disabled=false);
-      card.querySelectorAll('input').forEach(inp => { inp.disabled=false; inp.value=''; inp.classList.remove('ok','bad'); });
-      const fb = document.getElementById('fb-q'+i);
-      if (fb) fb.className = 'feedback';
-    }
-    window.scrollTo({top:0,behavior:'smooth'});
-  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 </script>
 </body>
 </html>
